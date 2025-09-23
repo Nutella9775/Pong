@@ -5,7 +5,7 @@ let leftScore = 0;
 let rightScore = 0;
 
 function drawBoard() {
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "white";
 
     for (let i = 0; i < canvas.height; i += 20) {
         ctx.fillRect(canvas.width / 2 - 2, i, 4, 10);
@@ -18,7 +18,7 @@ const speed = 2;
 let rafId;                       
 
 function drawBall() {
-    ctx.fillStyle = "orange";
+    ctx.fillStyle = "violet";
     ctx.beginPath();
     ctx.arc(x, y, 15, 0, Math.PI * 2);
     ctx.fill();
