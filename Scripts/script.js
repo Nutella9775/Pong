@@ -12,5 +12,34 @@ function drawBoard() {
     }
 }
 
+let x = 20;                      
+const y = canvas.height / 2;     
+const speed = 2;                 
+let rafId;                       
 
-drawBoard();
+function drawBall() {
+    ctx.fillStyle = "orange";
+    ctx.beginPath();
+    ctx.arc(x, y, 15, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function update() {
+    x += speed;
+    if (x > canvas.width - 15) x = -15; 
+}
+
+function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); 
+    drawBoard(); 
+    drawBall();
+    update();
+    rafId = requestAnimationFrame(loop);
+}
+
+loop();
+
+let stopAnimation = document.getElementById('stop');
+stopAnimation.addEventListener('click', () => {
+    cancelAnimationFrame(rafId)
+});
