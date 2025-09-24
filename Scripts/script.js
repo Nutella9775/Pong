@@ -5,9 +5,9 @@ let leftScore = 0;
 let rightScore = 0;
 
 let x = canvas.width / 2;      
-let y = canvas.height / 2;    
-let dx = 3;                    
-let dy = -3;                
+let y = canvas.height / 2;     
+let dx = 0;
+let dy = 0;
 let rafId = null;
 
 function drawBoard() {
@@ -30,17 +30,27 @@ function update() {
 
     if (x - 15 <= 0) {
         dx = -dx;
-        x = 15; 
+        x = 15;
     }
+
     if (x + 15 >= canvas.width) {
         dx = -dx;
         x = canvas.width - 15;
     }
+
     if (y - 15 <= 0) {
         dy = -dy;
         y = 15;
-    }   
+    }
+  
+     if (y + 15 >= canvas.height) {
+        cancelAnimationFrame(rafId);
+        rafId=null;
+        alert("Vous avez perdus, quel dommage :(");
+        resetBoard();
+     }
 }
+
 
 function loop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -53,7 +63,14 @@ function loop() {
 
 document.getElementById('start').addEventListener('click', () => {
     if (!rafId) {
-        loop(); 
+        x = canvas.width / 2;
+        y = canvas.height / 2;
+
+        let speed = 3;
+        dx = (Math.random() < 0.5 ? -1 : 1) * speed;
+        dy = (Math.random() < 0.5 ? -1 : 1) * speed;
+
+        loop();
     }
 });
 
@@ -62,9 +79,10 @@ document.getElementById('reset').addEventListener('click', () => {
     rafId = null;
     x = canvas.width / 2;
     y = canvas.height / 2;
-    dx = 3;
-    dy = -3;
+    dx = 0;
+    dy = 0;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBoard();
     drawBall();
 });
+
