@@ -2,4 +2,14 @@ canvas {
     background-image: url("../Images/cactus-desert.gif");
     background-size: cover;
     background-position: center;
+    border-style: double;
+    border-color: antiquewhite;
+}
+
+h1{
+    color: aqua;
+}
+
+body{
+    background-color: black;
 }
