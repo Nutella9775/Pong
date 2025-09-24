@@ -3,6 +3,8 @@ const ctx = canvas.getContext("2d");
 const paddleWidth = 100;
 const paddleHeight = 15;
 const paddleY = canvas.height - paddleHeight - 10; 
+const paddleSpeed = 7;
+
 
 let x = canvas.width / 2;
 let y = canvas.height / 2;
@@ -12,6 +14,8 @@ let rafId = null;
 let timerId = null;
 let seconds = 0;
 let paddleX = (canvas.width - paddleWidth) / 2;
+let moveLeft = false;
+let moveRight = false;
 
 function drawBoard() {
     ctx.fillStyle = "black";
@@ -42,6 +46,16 @@ function update() {
 
     if (y + 15 >= canvas.height) {
         gameOver();
+    }
+
+    if (moveLeft){
+
+
+    }
+
+    if (moveRight){
+
+        
     }
 }
 
@@ -109,4 +123,14 @@ document.getElementById('reset').addEventListener('click', () => {
     document.getElementById("gameOverMessage").classList.add("hidden");
 
     resetBoard();
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.code === "ArrowLeft") moveLeft = true;
+    if (e.code === "ArrowRight") moveRight = true;
+});
+
+document.addEventListener('keyup', (e) => {
+    if (e.code === "ArrowLeft") moveLeft = false;
+    if (e.code === "ArrowRight") moveRight = false;
 });
