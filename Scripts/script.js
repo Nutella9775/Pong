@@ -1,20 +1,28 @@
 const canvas = document.getElementById("pongCanvas");
 const ctx = canvas.getContext("2d");
+const paddleWidth = 100;
+const paddleHeight = 15;
+const paddleY = canvas.height - paddleHeight - 10; 
 
 let x = canvas.width / 2;
 let y = canvas.height / 2;
 let dx = 0;
 let dy = 0;
 let rafId = null;
-
 let timerId = null;
 let seconds = 0;
+let paddleX = (canvas.width - paddleWidth) / 2;
 
 function drawBoard() {
     ctx.fillStyle = "black";
     for (let i = 0; i < canvas.height; i += 20) {
         ctx.fillRect(canvas.width / 2 - 2, i, 4, 10);
     }
+}
+
+function drawPaddle(){
+    ctx.fillStyle = "lightgreen";
+    ctx.fillRect(paddleX, paddleY, paddleWidth, paddleHeight);
 }
 
 function drawBall() {
@@ -41,6 +49,7 @@ function loop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBoard();
     drawBall();
+    drawPaddle();
     update();
     rafId = requestAnimationFrame(loop);
 }
@@ -58,6 +67,7 @@ function stopTimer() {
     clearInterval(timerId);
     timerId = null;
 }
+
 
 function gameOver() {
     cancelAnimationFrame(rafId);
