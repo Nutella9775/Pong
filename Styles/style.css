@@ -6,10 +6,6 @@ canvas {
     border-color: antiquewhite;
 }
 
-h1{
-    color: aqua;
-}
-
-body{
-    background-color: black;
+.hidden {
+    display: none;
 }

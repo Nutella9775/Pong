@@ -1,14 +1,14 @@
 const canvas = document.getElementById("pongCanvas");
 const ctx = canvas.getContext("2d");
 
-let leftScore = 0;
-let rightScore = 0;
-
-let x = canvas.width / 2;      
-let y = canvas.height / 2;     
+let x = canvas.width / 2;
+let y = canvas.height / 2;
 let dx = 0;
 let dy = 0;
 let rafId = null;
+
+let timerId = null;
+let seconds = 0;
 
 function drawBoard() {
     ctx.fillStyle = "black";
@@ -28,29 +28,14 @@ function update() {
     x += dx;
     y += dy;
 
-    if (x - 15 <= 0) {
-        dx = -dx;
-        x = 15;
-    }
+    if (x - 15 <= 0) { dx = -dx; x = 15; }
+    if (x + 15 >= canvas.width) { dx = -dx; x = canvas.width - 15; }
+    if (y - 15 <= 0) { dy = -dy; y = 15; }
 
-    if (x + 15 >= canvas.width) {
-        dx = -dx;
-        x = canvas.width - 15;
+    if (y + 15 >= canvas.height) {
+        gameOver();
     }
-
-    if (y - 15 <= 0) {
-        dy = -dy;
-        y = 15;
-    }
-  
-     if (y + 15 >= canvas.height) {
-        cancelAnimationFrame(rafId);
-        rafId=null;
-        alert("Vous avez perdus, quel dommage :(");
-        resetBoard();
-     }
 }
-
 
 function loop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -60,23 +45,31 @@ function loop() {
     rafId = requestAnimationFrame(loop);
 }
 
+function startTimer() {
+    seconds = 0;
+    document.getElementById("score").textContent = "Score : 0 s";
+    timerId = setInterval(() => {
+        seconds++;
+        document.getElementById("score").textContent = `Score : ${seconds} s`;
+    }, 1000);
+}
 
-document.getElementById('start').addEventListener('click', () => {
-    if (!rafId) {
-        x = canvas.width / 2;
-        y = canvas.height / 2;
+function stopTimer() {
+    clearInterval(timerId);
+    timerId = null;
+}
 
-        let speed = 3;
-        dx = (Math.random() < 0.5 ? -1 : 1) * speed;
-        dy = (Math.random() < 0.5 ? -1 : 1) * speed;
-
-        loop();
-    }
-});
-
-document.getElementById('reset').addEventListener('click', () => {
+function gameOver() {
     cancelAnimationFrame(rafId);
     rafId = null;
+    stopTimer();
+
+    const msg = document.getElementById("gameOverMessage");
+    msg.textContent = `Vous avez perdu ! Votre score : ${seconds} s`;
+    msg.classList.remove("hidden");
+}
+
+function resetBoard() {
     x = canvas.width / 2;
     y = canvas.height / 2;
     dx = 0;
@@ -84,5 +77,26 @@ document.getElementById('reset').addEventListener('click', () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBoard();
     drawBall();
+    document.getElementById("score").textContent = "Score : 0 s";
+}
+
+document.getElementById('start').addEventListener('click', () => {
+    if (!rafId) {
+        let speed = 3;
+        dx = (Math.random() < 0.5 ? -1 : 1) * speed;
+        dy = (Math.random() < 0.5 ? -1 : 1) * speed;
+
+        loop();
+        startTimer();
+    }
 });
 
+document.getElementById('reset').addEventListener('click', () => {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+    stopTimer();
+
+    document.getElementById("gameOverMessage").classList.add("hidden");
+
+    resetBoard();
+});
