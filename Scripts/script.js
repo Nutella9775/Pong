@@ -49,14 +49,21 @@ function update() {
     }
 
     if (moveLeft){
-
-
+        paddleX -= paddleSpeed;
+        if (paddleX < 0) paddleX = 0;
     }
 
     if (moveRight){
-
-        
+        paddleX += paddleSpeed;
+        if (paddleX + paddleWidth > canvas.width) paddleX = canvas.width - paddleWidth;
     }
+
+    //collision avec raquette
+    if (y + 15 >= paddleY && y + 15 <= paddleY + paddleHeight &&
+    x >= paddleX && x <= paddleX + paddleWidth) {
+    dy = -dy;
+    y = paddleY - 15;
+}
 }
 
 function loop() {
@@ -106,14 +113,17 @@ function resetBoard() {
 
 document.getElementById('start').addEventListener('click', () => {
     if (!rafId) {
+        x = paddleX + paddleWidth / 2;
+        y = paddleY - 15;
+
         let speed = 3;
         dx = (Math.random() < 0.5 ? -1 : 1) * speed;
-        dy = (Math.random() < 0.5 ? -1 : 1) * speed;
+        dy = -speed;
 
         loop();
-        startTimer();
     }
 });
+
 
 document.getElementById('reset').addEventListener('click', () => {
     cancelAnimationFrame(rafId);
@@ -134,3 +144,12 @@ document.addEventListener('keyup', (e) => {
     if (e.code === "ArrowLeft") moveLeft = false;
     if (e.code === "ArrowRight") moveRight = false;
 });
+
+canvas.addEventListener("touchmove", (e) => {
+    let rect = canvas.getBoundingClientRect();
+    let touchX = e.touches[0].clientX - rect.left;
+    paddleX = touchX - paddleWidth / 2;
+    if (paddleX < 0) paddleX = 0;
+    if (paddleX + paddleWidth > canvas.width) paddleX = canvas.width - paddleWidth;
+    e.preventDefault();
+}, { passive: false });
