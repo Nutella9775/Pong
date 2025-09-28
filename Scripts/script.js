@@ -21,13 +21,6 @@ let moveRight = false;
 const scoreEl = document.getElementById("score");
 if (scoreEl) scoreEl.setAttribute('aria-live', 'polite');
 
-function drawBoard() {
-    ctx.fillStyle = "black";
-    for (let i = 0; i < canvas.height; i += 20) {
-        ctx.fillRect(canvas.width / 2 - 2, i, 4, 10);
-    }
-}
-
 function drawPaddle(){
     ctx.fillStyle = "lightgreen";
     ctx.fillRect(paddleX, paddleY, paddleWidth, paddleHeight);
@@ -73,7 +66,6 @@ function update() {
 
 function loop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBoard();
     drawBall();
     drawPaddle();
     update();
@@ -116,7 +108,6 @@ function resetBoard() {
     dy = 0;
     paddleX = (canvas.width - paddleWidth) / 2;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBoard();
     drawBall();
     if (scoreEl) scoreEl.textContent = "Score : 0 s";
     const msg = document.getElementById("gameOverMessage");

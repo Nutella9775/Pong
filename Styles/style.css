@@ -1,11 +1,61 @@
-canvas {
+body{
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--ui);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+:root {
+    --bg: #0b1220;
+    --canvas-bg: radial-gradient(circle at 30% 20%, #0f2433 0%, #0b1220 60%);
+}
+
+h1{
+    color: aliceblue;
+}
+
+p{
+  color: aliceblue;
+}
+
+main {
+  text-align: center;
+}
+
+
+#pongCanvas {
     background-image: url("../Images/cactus-desert.gif");
     background-size: cover;
     background-position: center;
-    border-style: double;
-    border-color: antiquewhite;
+    border: 3px solid;
+    border-color: rgb(255, 145, 0);
+    touch-action: none;
 }
 
 .hidden {
     display: none;
+}
+
+.button {
+  margin: 1rem 0;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+button:hover {
+  background: #76d976;
+  transform: translateY(-2px);
+}
+
+#gameOverMessage {
+  margin-top: 1.5rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: aliceblue;
 }
