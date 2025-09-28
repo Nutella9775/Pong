@@ -1,10 +1,11 @@
 const canvas = document.getElementById("pongCanvas");
+canvas.setAttribute('tabindex','0');
 const ctx = canvas.getContext("2d");
+
 const paddleWidth = 100;
 const paddleHeight = 15;
-const paddleY = canvas.height - paddleHeight - 10; 
+const paddleY = canvas.height - paddleHeight - 10;
 const paddleSpeed = 7;
-
 
 let x = canvas.width / 2;
 let y = canvas.height / 2;
@@ -16,6 +17,9 @@ let seconds = 0;
 let paddleX = (canvas.width - paddleWidth) / 2;
 let moveLeft = false;
 let moveRight = false;
+
+const scoreEl = document.getElementById("score");
+if (scoreEl) scoreEl.setAttribute('aria-live', 'polite');
 
 function drawBoard() {
     ctx.fillStyle = "black";
@@ -58,12 +62,13 @@ function update() {
         if (paddleX + paddleWidth > canvas.width) paddleX = canvas.width - paddleWidth;
     }
 
-    //collision avec raquette
     if (y + 15 >= paddleY && y + 15 <= paddleY + paddleHeight &&
-    x >= paddleX && x <= paddleX + paddleWidth) {
-    dy = -dy;
-    y = paddleY - 15;
-}
+        x >= paddleX && x <= paddleX + paddleWidth) {
+        dy = -Math.abs(dy);
+        const hitPos = (x - (paddleX + paddleWidth / 2)) / (paddleWidth / 2);
+        dx = (dx + hitPos * 2) || (hitPos * 2 || 1);
+        y = paddleY - 15;
+    }
 }
 
 function loop() {
@@ -76,11 +81,12 @@ function loop() {
 }
 
 function startTimer() {
+    if (timerId) return;
     seconds = 0;
-    document.getElementById("score").textContent = "Score : 0 s";
+    if (scoreEl) scoreEl.textContent = "Score : 0 s";
     timerId = setInterval(() => {
         seconds++;
-        document.getElementById("score").textContent = `Score : ${seconds} s`;
+        if (scoreEl) scoreEl.textContent = `Score : ${seconds} s`;
     }, 1000);
 }
 
@@ -89,15 +95,18 @@ function stopTimer() {
     timerId = null;
 }
 
-
 function gameOver() {
-    cancelAnimationFrame(rafId);
-    rafId = null;
+    if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+    }
     stopTimer();
 
     const msg = document.getElementById("gameOverMessage");
-    msg.textContent = `Vous avez perdu ! Votre score : ${seconds} s`;
-    msg.classList.remove("hidden");
+    if (msg) {
+        msg.textContent = `Vous avez perdu ! Votre score : ${seconds} s`;
+        msg.classList.remove("hidden");
+    }
 }
 
 function resetBoard() {
@@ -105,10 +114,13 @@ function resetBoard() {
     y = canvas.height / 2;
     dx = 0;
     dy = 0;
+    paddleX = (canvas.width - paddleWidth) / 2;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBoard();
     drawBall();
-    document.getElementById("score").textContent = "Score : 0 s";
+    if (scoreEl) scoreEl.textContent = "Score : 0 s";
+    const msg = document.getElementById("gameOverMessage");
+    if (msg) msg.classList.add("hidden");
 }
 
 document.getElementById('start').addEventListener('click', () => {
@@ -116,21 +128,31 @@ document.getElementById('start').addEventListener('click', () => {
         x = paddleX + paddleWidth / 2;
         y = paddleY - 15;
 
-        let speed = 3;
-        dx = (Math.random() < 0.5 ? -1 : 1) * speed;
-        dy = -speed;
+        const minAngle = Math.PI / 6;
+        const maxAngle = Math.PI - Math.PI / 6;
+        const angle = Math.random() * (maxAngle - minAngle) + minAngle;
+        const speed = 3;
+        dx = Math.cos(angle) * speed;
+        dy = -Math.abs(Math.sin(angle) * speed);
+
+        startTimer();
+
+        const msg = document.getElementById("gameOverMessage");
+        if (msg) msg.classList.add("hidden");
 
         loop();
     }
 });
 
-
 document.getElementById('reset').addEventListener('click', () => {
-    cancelAnimationFrame(rafId);
-    rafId = null;
+    if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+    }
     stopTimer();
 
-    document.getElementById("gameOverMessage").classList.add("hidden");
+    const msg = document.getElementById("gameOverMessage");
+    if (msg) msg.classList.add("hidden");
 
     resetBoard();
 });
@@ -153,3 +175,20 @@ canvas.addEventListener("touchmove", (e) => {
     if (paddleX + paddleWidth > canvas.width) paddleX = canvas.width - paddleWidth;
     e.preventDefault();
 }, { passive: false });
+
+let dragging = false;
+canvas.addEventListener('mousedown', (e) => {
+    dragging = true;
+    const rect = canvas.getBoundingClientRect();
+    paddleX = e.clientX - rect.left - paddleWidth / 2;
+});
+window.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    const rect = canvas.getBoundingClientRect();
+    paddleX = e.clientX - rect.left - paddleWidth / 2;
+    if (paddleX < 0) paddleX = 0;
+    if (paddleX + paddleWidth > canvas.width) paddleX = canvas.width - paddleWidth;
+});
+window.addEventListener('mouseup', () => { dragging = false; });
+
+resetBoard();
