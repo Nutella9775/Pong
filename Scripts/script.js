@@ -2,31 +2,40 @@ const canvas = document.getElementById("pongCanvas");
 canvas.setAttribute('tabindex','0');
 const ctx = canvas.getContext("2d");
 
-const paddleWidth = 100;
-const paddleHeight = 15;
-const paddleY = canvas.height - paddleHeight - 10;
-const paddleSpeed = 7;
+const logicalWidth = canvas.width;
+const logicalHeight = canvas.height;
 
-let x = canvas.width / 2;
-let y = canvas.height / 2;
+let paddleWidth = 100;
+let paddleHeight = 15;
+let paddleY = logicalHeight - paddleHeight - 10;
+let paddleSpeed = 7;
+
+let x = logicalWidth / 2;
+let y = logicalHeight / 2;
 let dx = 0;
 let dy = 0;
 let rafId = null;
 let timerId = null;
 let seconds = 0;
-let paddleX = (canvas.width - paddleWidth) / 2;
+let paddleX = (logicalWidth - paddleWidth) / 2;
 let moveLeft = false;
 let moveRight = false;
 
 const scoreEl = document.getElementById("score");
 if (scoreEl) scoreEl.setAttribute('aria-live', 'polite');
 
-function drawPaddle(){
+function getScale() {
+    return canvas.clientWidth / logicalWidth;
+}
+
+function drawPaddle() {
+    const scale = getScale();
     ctx.fillStyle = "lightgreen";
     ctx.fillRect(paddleX, paddleY, paddleWidth, paddleHeight);
 }
 
 function drawBall() {
+    const scale = getScale();
     ctx.fillStyle = "yellow";
     ctx.beginPath();
     ctx.arc(x, y, 15, 0, Math.PI * 2);
@@ -38,10 +47,10 @@ function update() {
     y += dy;
 
     if (x - 15 <= 0) { dx = -dx; x = 15; }
-    if (x + 15 >= canvas.width) { dx = -dx; x = canvas.width - 15; }
+    if (x + 15 >= logicalWidth) { dx = -dx; x = logicalWidth - 15; }
     if (y - 15 <= 0) { dy = -dy; y = 15; }
 
-    if (y + 15 >= canvas.height) {
+    if (y + 15 >= logicalHeight) {
         gameOver();
     }
 
@@ -49,10 +58,9 @@ function update() {
         paddleX -= paddleSpeed;
         if (paddleX < 0) paddleX = 0;
     }
-
     if (moveRight){
         paddleX += paddleSpeed;
-        if (paddleX + paddleWidth > canvas.width) paddleX = canvas.width - paddleWidth;
+        if (paddleX + paddleWidth > logicalWidth) paddleX = logicalWidth - paddleWidth;
     }
 
     if (y + 15 >= paddleY && y + 15 <= paddleY + paddleHeight &&
@@ -65,7 +73,7 @@ function update() {
 }
 
 function loop() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, logicalWidth, logicalHeight);
     drawBall();
     drawPaddle();
     update();
@@ -102,12 +110,12 @@ function gameOver() {
 }
 
 function resetBoard() {
-    x = canvas.width / 2;
-    y = canvas.height / 2;
+    x = logicalWidth / 2;
+    y = logicalHeight / 2;
     dx = 0;
     dy = 0;
-    paddleX = (canvas.width - paddleWidth) / 2;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    paddleX = (logicalWidth - paddleWidth) / 2;
+    ctx.clearRect(0, 0, logicalWidth, logicalHeight);
     drawBall();
     if (scoreEl) scoreEl.textContent = "Score : 0 s";
     const msg = document.getElementById("gameOverMessage");
@@ -152,33 +160,31 @@ document.addEventListener('keydown', (e) => {
     if (e.code === "ArrowLeft") moveLeft = true;
     if (e.code === "ArrowRight") moveRight = true;
 });
-
 document.addEventListener('keyup', (e) => {
     if (e.code === "ArrowLeft") moveLeft = false;
     if (e.code === "ArrowRight") moveRight = false;
 });
 
+function getMousePos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scale = getScale();
+    return (e.clientX - rect.left) / scale - paddleWidth / 2;
+}
+
 canvas.addEventListener("touchmove", (e) => {
-    let rect = canvas.getBoundingClientRect();
-    let touchX = e.touches[0].clientX - rect.left;
-    paddleX = touchX - paddleWidth / 2;
+    paddleX = getMousePos(e.touches[0]);
     if (paddleX < 0) paddleX = 0;
-    if (paddleX + paddleWidth > canvas.width) paddleX = canvas.width - paddleWidth;
+    if (paddleX + paddleWidth > logicalWidth) paddleX = logicalWidth - paddleWidth;
     e.preventDefault();
 }, { passive: false });
 
 let dragging = false;
-canvas.addEventListener('mousedown', (e) => {
-    dragging = true;
-    const rect = canvas.getBoundingClientRect();
-    paddleX = e.clientX - rect.left - paddleWidth / 2;
-});
+canvas.addEventListener('mousedown', (e) => { dragging = true; paddleX = getMousePos(e); });
 window.addEventListener('mousemove', (e) => {
     if (!dragging) return;
-    const rect = canvas.getBoundingClientRect();
-    paddleX = e.clientX - rect.left - paddleWidth / 2;
+    paddleX = getMousePos(e);
     if (paddleX < 0) paddleX = 0;
-    if (paddleX + paddleWidth > canvas.width) paddleX = canvas.width - paddleWidth;
+    if (paddleX + paddleWidth > logicalWidth) paddleX = logicalWidth - paddleWidth;
 });
 window.addEventListener('mouseup', () => { dragging = false; });
 
