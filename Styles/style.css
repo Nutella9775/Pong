@@ -1,44 +1,47 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: var(--font-sans, Arial, sans-serif);
-  background: var(--bg, #0b1220);
-  color: var(--ui, white);
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--ui);
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
 }
 
+:root {
+  --bg: #0b1220;
+  --canvas-bg: radial-gradient(circle at 30% 20%, #0f2433 0%, #0b1220 60%);
+}
+
 h1 {
   color: aliceblue;
-  font-size: clamp(1.2rem, 2vw, 2rem);
-  margin-bottom: 1rem;
 }
 
 p {
   color: aliceblue;
-  font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+  font-size:larger;
 }
 
 main {
   text-align: center;
   width: 95%;
-  max-width: 100%;
+  max-width: 600px;
   margin: auto;
 }
 
 #pongCanvas {
-  width: 100%;
+  width: 90vw;         
+  max-width: 500px; 
+  aspect-ratio: 1/2; 
   height: auto;
-  aspect-ratio: 1/2;
   background-image: url("../Images/cactus-desert.gif");
   background-size: cover;
   background-position: center;
   border: 3px solid rgb(255, 145, 0);
   touch-action: none;
 }
-
 
 .hidden {
   display: none;
@@ -48,15 +51,17 @@ main {
   margin: 1rem 0;
   display: flex;
   justify-content: center;
-  gap: 1rem;
   flex-wrap: wrap;
+  gap: 1rem;
 }
 
 button {
-  padding: 0.6rem 1rem;
-  font-size: clamp(0.9rem, 2vw, 1rem);
-  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
   border: none;
+  border-radius: 8px;
+  background: #4caf50;
+  color: white;
+  font-size: 1rem;
   cursor: pointer;
   transition: 0.2s;
 }
@@ -68,18 +73,7 @@ button:hover {
 
 #gameOverMessage {
   margin-top: 1.5rem;
-  font-size: clamp(1rem, 2vw, 1.2rem);
+  font-size: 1.2rem;
   font-weight: bold;
   color: aliceblue;
-}
-
-@media (max-width: 600px) {
-  .button {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  button {
-    width: 100%;
-  }
 }
