@@ -28,11 +28,10 @@ main {
   margin: auto;
 }
 
-/* Canvas responsive */
 #pongCanvas {
   width: 100%;
   height: auto;
-  aspect-ratio: 1/2; /* format portrait */
+  aspect-ratio: 1/2;
   background-image: url("../Images/cactus-desert.gif");
   background-size: cover;
   background-position: center;
