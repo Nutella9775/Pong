@@ -14,6 +14,10 @@ let x = logicalWidth / 2;
 let y = logicalHeight / 2;
 let dx = 0;
 let dy = 0;
+const initialSpeed = 3;
+const maxSpeed = initialSpeed * 5;
+let speed = initialSpeed;
+
 let rafId = null;
 let timerId = null;
 let seconds = 0;
@@ -29,26 +33,32 @@ function getScale() {
 }
 
 function drawPaddle() {
-    const scale = getScale();
     ctx.fillStyle = "lightgreen";
     ctx.fillRect(paddleX, paddleY, paddleWidth, paddleHeight);
 }
 
 function drawBall() {
-    const scale = getScale();
     ctx.fillStyle = "yellow";
     ctx.beginPath();
     ctx.arc(x, y, 15, 0, Math.PI * 2);
     ctx.fill();
 }
 
+function increaseSpeed() {
+    speed *= 1.05;
+    if (speed > maxSpeed) speed = maxSpeed;
+    const angle = Math.atan2(dy, dx);
+    dx = Math.cos(angle) * speed;
+    dy = Math.sin(angle) * speed;
+}
+
 function update() {
     x += dx;
     y += dy;
 
-    if (x - 15 <= 0) { dx = -dx; x = 15; }
-    if (x + 15 >= logicalWidth) { dx = -dx; x = logicalWidth - 15; }
-    if (y - 15 <= 0) { dy = -dy; y = 15; }
+    if (x - 15 <= 0) { dx = -dx; x = 15; increaseSpeed(); }
+    if (x + 15 >= logicalWidth) { dx = -dx; x = logicalWidth - 15; increaseSpeed(); }
+    if (y - 15 <= 0) { dy = -dy; y = 15; increaseSpeed(); }
 
     if (y + 15 >= logicalHeight) {
         gameOver();
@@ -69,6 +79,7 @@ function update() {
         const hitPos = (x - (paddleX + paddleWidth / 2)) / (paddleWidth / 2);
         dx = (dx + hitPos * 2) || (hitPos * 2 || 1);
         y = paddleY - 15;
+        increaseSpeed();
     }
 }
 
@@ -114,6 +125,7 @@ function resetBoard() {
     y = logicalHeight / 2;
     dx = 0;
     dy = 0;
+    speed = initialSpeed;
     paddleX = (logicalWidth - paddleWidth) / 2;
     ctx.clearRect(0, 0, logicalWidth, logicalHeight);
     drawBall();
@@ -130,7 +142,7 @@ document.getElementById('start').addEventListener('click', () => {
         const minAngle = Math.PI / 6;
         const maxAngle = Math.PI - Math.PI / 6;
         const angle = Math.random() * (maxAngle - minAngle) + minAngle;
-        const speed = 3;
+        speed = initialSpeed;
         dx = Math.cos(angle) * speed;
         dy = -Math.abs(Math.sin(angle) * speed);
 
